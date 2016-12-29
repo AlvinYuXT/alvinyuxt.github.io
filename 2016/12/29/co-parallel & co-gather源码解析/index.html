@@ -84,29 +84,23 @@
 
 
 
-<meta name="description" content="co-parallel &amp;amp; co-gather源码解析
-原文链接，转载请注明出处
-
-最近看了Ma63d关于爬虫的这篇文章，正好自己也在做爬虫，看到他在文中提到了co-parallel和co-gather，就打算改一下自己的代码（本来代码就只是为了爬一些自己感兴趣的东西，现在还在改，地址在这里）。昨天也是好好的看了一下co-parallel的源码，今天打算自己来做一下解析。
-co-paral">
+<meta name="description" content="最近看了Ma63d关于爬虫的这篇文章，正好自己也在做爬虫，看到他在文中提到了co-parallel和co-gather，就打算改一下自己的代码（本来代码就只是为了爬一些自己感兴趣的东西，现在还在改，地址在这里）。昨天也是好好的看了一下co-parallel的源码，今天打算自己来做一下解析。
+co-parallel源码如下：
+1234567891011121314151617var thread =">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Future&Hope">
+<meta property="og:title" content="co-parallel & co-gather源码解析">
 <meta property="og:url" content="http://yoursite.com/2016/12/29/co-parallel & co-gather源码解析/index.html">
 <meta property="og:site_name" content="Future&Hope">
-<meta property="og:description" content="co-parallel &amp;amp; co-gather源码解析
-原文链接，转载请注明出处
-
-最近看了Ma63d关于爬虫的这篇文章，正好自己也在做爬虫，看到他在文中提到了co-parallel和co-gather，就打算改一下自己的代码（本来代码就只是为了爬一些自己感兴趣的东西，现在还在改，地址在这里）。昨天也是好好的看了一下co-parallel的源码，今天打算自己来做一下解析。
-co-paral">
+<meta property="og:description" content="最近看了Ma63d关于爬虫的这篇文章，正好自己也在做爬虫，看到他在文中提到了co-parallel和co-gather，就打算改一下自己的代码（本来代码就只是为了爬一些自己感兴趣的东西，现在还在改，地址在这里）。昨天也是好好的看了一下co-parallel的源码，今天打算自己来做一下解析。
+co-parallel源码如下：
+1234567891011121314151617var thread =">
 <meta property="og:image" content="http://yoursite.com/Users/yuxitong/Desktop/屏幕快照 2016-12-29 上午11.46.11.png">
-<meta property="og:updated_time" content="2016-12-29T04:31:00.000Z">
+<meta property="og:updated_time" content="2016-12-29T04:38:42.000Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Future&Hope">
-<meta name="twitter:description" content="co-parallel &amp;amp; co-gather源码解析
-原文链接，转载请注明出处
-
-最近看了Ma63d关于爬虫的这篇文章，正好自己也在做爬虫，看到他在文中提到了co-parallel和co-gather，就打算改一下自己的代码（本来代码就只是为了爬一些自己感兴趣的东西，现在还在改，地址在这里）。昨天也是好好的看了一下co-parallel的源码，今天打算自己来做一下解析。
-co-paral">
+<meta name="twitter:title" content="co-parallel & co-gather源码解析">
+<meta name="twitter:description" content="最近看了Ma63d关于爬虫的这篇文章，正好自己也在做爬虫，看到他在文中提到了co-parallel和co-gather，就打算改一下自己的代码（本来代码就只是为了爬一些自己感兴趣的东西，现在还在改，地址在这里）。昨天也是好好的看了一下co-parallel的源码，今天打算自己来做一下解析。
+co-parallel源码如下：
+1234567891011121314151617var thread =">
 <meta name="twitter:image" content="http://yoursite.com/Users/yuxitong/Desktop/屏幕快照 2016-12-29 上午11.46.11.png">
 
 
@@ -141,7 +135,7 @@ co-paral">
 
 
 
-  <title>  | Future&Hope </title>
+  <title> co-parallel & co-gather源码解析 | Future&Hope </title>
 </head>
 
 <body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
@@ -296,7 +290,7 @@ co-paral">
             
             
               
-                
+                co-parallel & co-gather源码解析
               
             
           </h1>
@@ -308,7 +302,7 @@ co-paral">
               <i class="fa fa-calendar-o"></i>
             </span>
             <span class="post-meta-item-text">发表于</span>
-            <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-12-29T11:34:57+08:00">
+            <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-12-29T12:38:42+08:00">
               2016-12-29
             </time>
 
@@ -317,12 +311,31 @@ co-paral">
             <span class="post-meta-item-icon">
               <i class="fa fa-calendar-check-o"></i>
             </span>
-            <time title="Post modified" itemprop="dateModified" datetime="2016-12-29T12:31:00+08:00">
+            <time title="Post modified" itemprop="dateModified" datetime="2016-12-29T12:38:42+08:00">
               2016-12-29
             </time>
             
           </span>
 
+          
+            <span class="post-category" >
+              &nbsp; | &nbsp;
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/js/" itemprop="url" rel="index">
+                    <span itemprop="name">js</span>
+                  </a>
+                </span>
+
+                
+                
+
+              
+            </span>
           
 
           
@@ -356,10 +369,7 @@ co-paral">
       
 
       
-        <h2 id="co-parallel-amp-co-gather源码解析"><a href="#co-parallel-amp-co-gather源码解析" class="headerlink" title="co-parallel &amp; co-gather源码解析"></a>co-parallel &amp; co-gather源码解析</h2><blockquote>
-<p>原文链接，转载请注明出处</p>
-</blockquote>
-<p>最近看了<a href="http://www.chuckliu.me/" target="_blank" rel="external">Ma63d</a>关于爬虫的<a href="http://www.chuckliu.me/#!/posts/585a490ba615fc14847bff57" target="_blank" rel="external">这篇文章</a>，正好自己也在做爬虫，看到他在文中提到了co-parallel和co-gather，就打算改一下自己的代码（本来代码就只是为了爬一些自己感兴趣的东西，现在还在改，<a href="https://github.com/AlvinYuXT/internal-info" target="_blank" rel="external">地址在这里</a>）。昨天也是好好的看了一下co-parallel的源码，今天打算自己来做一下解析。</p>
+        <p>最近看了<a href="http://www.chuckliu.me/" target="_blank" rel="external">Ma63d</a>关于爬虫的<a href="http://www.chuckliu.me/#!/posts/585a490ba615fc14847bff57" target="_blank" rel="external">这篇文章</a>，正好自己也在做爬虫，看到他在文中提到了co-parallel和co-gather，就打算改一下自己的代码（本来代码就只是为了爬一些自己感兴趣的东西，现在还在改，<a href="https://github.com/AlvinYuXT/internal-info" target="_blank" rel="external">地址在这里</a>）。昨天也是好好的看了一下co-parallel的源码，今天打算自己来做一下解析。</p>
 <h3 id="co-parallel"><a href="#co-parallel" class="headerlink" title="co-parallel"></a>co-parallel</h3><p>源码如下：</p>
 <figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> thread = <span class="built_in">require</span>(<span class="string">'co-thread'</span>);</div><div class="line"></div><div class="line"><span class="built_in">module</span>.exports = <span class="function"><span class="keyword">function</span> *<span class="title">parallel</span>(<span class="params">thunks, n</span>)</span>&#123;</div><div class="line">  <span class="keyword">var</span> n = <span class="built_in">Math</span>.min(n || <span class="number">5</span>, thunks.length);</div><div class="line">  <span class="keyword">var</span> ret = [];</div><div class="line">  <span class="keyword">var</span> index = <span class="number">0</span>;</div><div class="line"></div><div class="line">  <span class="function"><span class="keyword">function</span> *<span class="title">next</span>(<span class="params"></span>) </span>&#123;</div><div class="line">    <span class="keyword">var</span> i = index++;</div><div class="line">    ret[i] = <span class="keyword">yield</span> thunks[i];</div><div class="line">    <span class="keyword">if</span> (index &lt; thunks.length) <span class="keyword">yield</span> next;</div><div class="line">  &#125;</div><div class="line"></div><div class="line">  <span class="keyword">yield</span> thread(next, n);</div><div class="line"></div><div class="line">  <span class="keyword">return</span> ret;</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
 <p>这段代码真的是很短，但是方法真的很巧妙。因为两个方法用到了co-thread，这里把co-thread的源码也贴出来：</p>
@@ -438,7 +448,7 @@ co-paral">
   <div class="comments" id="comments">
     
       <div class="ds-thread" data-thread-key="2016/12/29/co-parallel & co-gather源码解析/"
-           data-title="" data-url="http://yoursite.com/2016/12/29/co-parallel & co-gather源码解析/">
+           data-title="co-parallel & co-gather源码解析" data-url="http://yoursite.com/2016/12/29/co-parallel & co-gather源码解析/">
       </div>
     
   </div>
@@ -546,7 +556,7 @@ co-paral">
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#co-parallel-amp-co-gather源码解析"><span class="nav-number">1.</span> <span class="nav-text">co-parallel & co-gather源码解析</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#co-parallel"><span class="nav-number">1.1.</span> <span class="nav-text">co-parallel</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#co-gather"><span class="nav-number">1.2.</span> <span class="nav-text">co-gather</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#总结"><span class="nav-number">1.3.</span> <span class="nav-text">总结</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#co-parallel"><span class="nav-number">1.</span> <span class="nav-text">co-parallel</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#co-gather"><span class="nav-number">2.</span> <span class="nav-text">co-gather</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#总结"><span class="nav-number">3.</span> <span class="nav-text">总结</span></a></li></ol></div>
             
 
           </div>
