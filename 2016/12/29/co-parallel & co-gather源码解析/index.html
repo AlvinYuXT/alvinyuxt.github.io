@@ -1,0 +1,711 @@
+<!doctype html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+  
+  
+  
+  
+
+  
+    
+    
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+    
+    
+    <link href="//fonts.googleapis.com/css?family=Lato:300,300italic,400,400italic,700,700italic&subset=latin,latin-ext" rel="stylesheet" type="text/css">
+  
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.0" rel="stylesheet" type="text/css" />
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+
+
+
+  <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico?v=5.1.0" />
+
+
+
+
+
+
+<meta name="description" content="co-parallel &amp;amp; co-gather源码解析
+原文链接，转载请注明出处
+
+最近看了Ma63d关于爬虫的这篇文章，正好自己也在做爬虫，看到他在文中提到了co-parallel和co-gather，就打算改一下自己的代码（本来代码就只是为了爬一些自己感兴趣的东西，现在还在改，地址在这里）。昨天也是好好的看了一下co-parallel的源码，今天打算自己来做一下解析。
+co-paral">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Future&Hope">
+<meta property="og:url" content="http://yoursite.com/2016/12/29/co-parallel & co-gather源码解析/index.html">
+<meta property="og:site_name" content="Future&Hope">
+<meta property="og:description" content="co-parallel &amp;amp; co-gather源码解析
+原文链接，转载请注明出处
+
+最近看了Ma63d关于爬虫的这篇文章，正好自己也在做爬虫，看到他在文中提到了co-parallel和co-gather，就打算改一下自己的代码（本来代码就只是为了爬一些自己感兴趣的东西，现在还在改，地址在这里）。昨天也是好好的看了一下co-parallel的源码，今天打算自己来做一下解析。
+co-paral">
+<meta property="og:image" content="http://yoursite.com/Users/yuxitong/Desktop/屏幕快照 2016-12-29 上午11.46.11.png">
+<meta property="og:updated_time" content="2016-12-29T04:31:00.000Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="Future&Hope">
+<meta name="twitter:description" content="co-parallel &amp;amp; co-gather源码解析
+原文链接，转载请注明出处
+
+最近看了Ma63d关于爬虫的这篇文章，正好自己也在做爬虫，看到他在文中提到了co-parallel和co-gather，就打算改一下自己的代码（本来代码就只是为了爬一些自己感兴趣的东西，现在还在改，地址在这里）。昨天也是好好的看了一下co-parallel的源码，今天打算自己来做一下解析。
+co-paral">
+<meta name="twitter:image" content="http://yoursite.com/Users/yuxitong/Desktop/屏幕快照 2016-12-29 上午11.46.11.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    sidebar: {"position":"left","display":"post"},
+    fancybox: true,
+    motion: true,
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2016/12/29/co-parallel & co-gather源码解析/"/>
+
+
+
+
+
+  <title>  | Future&Hope </title>
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+
+
+
+  <script type="text/javascript">
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "//hm.baidu.com/hm.js?f25534e6cfa6877b1517267a37f49d76";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+
+  
+  
+    
+  
+
+  <div class="container one-collumn sidebar-position-left page-post-detail ">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-meta ">
+  
+
+  <div class="custom-logo-site-title">
+    <a href="/"  class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <span class="site-title">Future&Hope</span>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+  </div>
+  <p class="site-subtitle"></p>
+</div>
+
+<div class="site-nav-toggle">
+  <button>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+    <span class="btn-bar"></span>
+  </button>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-categories">
+          <a href="/categories" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-th"></i> <br />
+            
+            分类
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            归档
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-tags">
+          <a href="/tags" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-tags"></i> <br />
+            
+            标签
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal " itemscope itemtype="http://schema.org/Article">
+  <link itemprop="mainEntityOfPage" href="http://yoursite.com/2016/12/29/co-parallel & co-gather源码解析/">
+
+  <span style="display:none" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <meta itemprop="name" content="alvinyuxt">
+    <meta itemprop="description" content="">
+    <meta itemprop="image" content="/uploads/avatar.jpeg">
+  </span>
+
+  <span style="display:none" itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+    <meta itemprop="name" content="Future&Hope">
+    <span style="display:none" itemprop="logo" itemscope itemtype="http://schema.org/ImageObject">
+      <img style="display:none;" itemprop="url image" alt="Future&Hope" src="">
+    </span>
+  </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+            
+            
+              
+                
+              
+            
+          </h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-o"></i>
+            </span>
+            <span class="post-meta-item-text">发表于</span>
+            <time title="Post created" itemprop="dateCreated datePublished" datetime="2016-12-29T11:34:57+08:00">
+              2016-12-29
+            </time>
+
+            &nbsp;|&nbsp;
+
+            <span class="post-meta-item-icon">
+              <i class="fa fa-calendar-check-o"></i>
+            </span>
+            <time title="Post modified" itemprop="dateModified" datetime="2016-12-29T12:31:00+08:00">
+              2016-12-29
+            </time>
+            
+          </span>
+
+          
+
+          
+            
+              <span class="post-comments-count">
+                &nbsp; | &nbsp;
+                <a href="/2016/12/29/co-parallel & co-gather源码解析/#comments" itemprop="discussionUrl">
+                  <span class="post-comments-count ds-thread-count" data-thread-key="2016/12/29/co-parallel & co-gather源码解析/" itemprop="commentCount"></span>
+                </a>
+              </span>
+            
+          
+
+          
+
+          
+          
+
+          
+          
+          
+
+        </div>
+      </header>
+    
+
+
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="co-parallel-amp-co-gather源码解析"><a href="#co-parallel-amp-co-gather源码解析" class="headerlink" title="co-parallel &amp; co-gather源码解析"></a>co-parallel &amp; co-gather源码解析</h2><blockquote>
+<p>原文链接，转载请注明出处</p>
+</blockquote>
+<p>最近看了<a href="http://www.chuckliu.me/" target="_blank" rel="external">Ma63d</a>关于爬虫的<a href="http://www.chuckliu.me/#!/posts/585a490ba615fc14847bff57" target="_blank" rel="external">这篇文章</a>，正好自己也在做爬虫，看到他在文中提到了co-parallel和co-gather，就打算改一下自己的代码（本来代码就只是为了爬一些自己感兴趣的东西，现在还在改，<a href="https://github.com/AlvinYuXT/internal-info" target="_blank" rel="external">地址在这里</a>）。昨天也是好好的看了一下co-parallel的源码，今天打算自己来做一下解析。</p>
+<h3 id="co-parallel"><a href="#co-parallel" class="headerlink" title="co-parallel"></a>co-parallel</h3><p>源码如下：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> thread = <span class="built_in">require</span>(<span class="string">'co-thread'</span>);</div><div class="line"></div><div class="line"><span class="built_in">module</span>.exports = <span class="function"><span class="keyword">function</span> *<span class="title">parallel</span>(<span class="params">thunks, n</span>)</span>&#123;</div><div class="line">  <span class="keyword">var</span> n = <span class="built_in">Math</span>.min(n || <span class="number">5</span>, thunks.length);</div><div class="line">  <span class="keyword">var</span> ret = [];</div><div class="line">  <span class="keyword">var</span> index = <span class="number">0</span>;</div><div class="line"></div><div class="line">  <span class="function"><span class="keyword">function</span> *<span class="title">next</span>(<span class="params"></span>) </span>&#123;</div><div class="line">    <span class="keyword">var</span> i = index++;</div><div class="line">    ret[i] = <span class="keyword">yield</span> thunks[i];</div><div class="line">    <span class="keyword">if</span> (index &lt; thunks.length) <span class="keyword">yield</span> next;</div><div class="line">  &#125;</div><div class="line"></div><div class="line">  <span class="keyword">yield</span> thread(next, n);</div><div class="line"></div><div class="line">  <span class="keyword">return</span> ret;</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<p>这段代码真的是很短，但是方法真的很巧妙。因为两个方法用到了co-thread，这里把co-thread的源码也贴出来：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div></pre></td><td class="code"><pre><div class="line"><span class="function"><span class="keyword">function</span> <span class="title">thread</span>(<span class="params">fn, n</span>) </span>&#123;</div><div class="line">  <span class="keyword">var</span> gens = [];</div><div class="line">  <span class="keyword">while</span> (n--) gens.push(fn);</div><div class="line">  <span class="keyword">return</span> gens;</div><div class="line">&#125;</div></pre></td></tr></table></figure>
+<blockquote>
+<p>Run <code>fn</code> <code>n</code> times in parallel.</p>
+</blockquote>
+<p>源码的描述就是为了parallel执行而创建的。由于在next外部创建了一个index变量，通过控制index的变化就可以使得每次执行的next函数都是不同的函数，在next中继续递归yield自己的话就是可以继续执行不同的next，最终把所有的thunks都yield了一遍，方法是不是很巧妙。</p>
+<p>如果你觉得我说的话很混乱，那我们还是还是拿一个co-parallel中的例子来讲吧</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div><div class="line">20</div><div class="line">21</div><div class="line">22</div><div class="line">23</div><div class="line">24</div><div class="line">25</div><div class="line">26</div><div class="line">27</div><div class="line">28</div><div class="line">29</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> request = <span class="built_in">require</span>(<span class="string">'co-request'</span>);</div><div class="line"><span class="keyword">var</span> co = <span class="built_in">require</span>(<span class="string">'co'</span>);</div><div class="line"><span class="keyword">var</span> parallel = <span class="built_in">require</span>(<span class="string">'co-parallel'</span>);</div><div class="line"></div><div class="line"><span class="keyword">var</span> urls = [</div><div class="line">  <span class="string">'http://google.com'</span>,</div><div class="line">  <span class="string">'http://yahoo.com'</span>,</div><div class="line">  <span class="string">'http://ign.com'</span>,</div><div class="line">  <span class="string">'http://cloudup.com'</span>,</div><div class="line">  <span class="string">'http://myspace.com'</span>,</div><div class="line">  <span class="string">'http://facebook.com'</span>,</div><div class="line">  <span class="string">'http://cuteoverload.com'</span>,</div><div class="line">  <span class="string">'http://uglyoverload.com'</span>,</div><div class="line">  <span class="string">'http://segment.io'</span></div><div class="line">];</div><div class="line"></div><div class="line"><span class="function"><span class="keyword">function</span> *<span class="title">status</span>(<span class="params">url</span>) </span>&#123;</div><div class="line">  <span class="built_in">console</span>.log(<span class="string">'GET %s'</span>, url);</div><div class="line">  <span class="keyword">var</span> s = (<span class="keyword">yield</span> request(url)).statusCode;</div><div class="line">  <span class="keyword">return</span> s;</div><div class="line">&#125;</div><div class="line"></div><div class="line">co(<span class="function"><span class="keyword">function</span> *(<span class="params"></span>)</span>&#123;</div><div class="line">  <span class="keyword">var</span> start = <span class="built_in">Date</span>.now();</div><div class="line">  <span class="keyword">var</span> reqs = urls.map(status);</div><div class="line">  <span class="keyword">var</span> res = <span class="keyword">yield</span> parallel(reqs, <span class="number">3</span>);</div><div class="line">  <span class="built_in">console</span>.log(res);</div><div class="line">  <span class="built_in">console</span>.log(<span class="string">'duration: %dms'</span>, <span class="built_in">Date</span>.now() - start);</div><div class="line">&#125;);</div></pre></td></tr></table></figure>
+<p>直接看到<code>var reqs = urls.map(status);</code>这句，由于传递给map的callback是一个Generator函数，所以最后的返回就是Generator的内部指针，也就是Iterator，也就是status()执行了一遍返回的结果。</p>
+<p><img src="/Users/yuxitong/Desktop/屏幕快照 2016-12-29 上午11.46.11.png" alt="屏幕快照 2016-12-29 上午11.46.11"></p>
+<p>再到<code>var res = yield parallel(reqs, 3);</code>这里，由于parallel是一个Generator，所以直接进入parallel中，因为<code>n=3</code>所以thread返回的数组内容应该是类似这个 <code>[function*() {yield thunks[0]},function*(){yield thunks[1]}]</code>。由于<code>yield thread</code>返回的结果是数组，在co中会对数组做<code>Promise.all(obj.map(toPromise, this));</code>因为obj中都是Generator，所以toPromise会直接对每一个Generator继续调用<code>co(function*(){yield thunk[i]})</code>。在next中最后又继续yield自己，所以当当一个thunk结束之后会继续下一个thunk。</p>
+<h3 id="co-gather"><a href="#co-gather" class="headerlink" title="co-gather"></a>co-gather</h3><p>co-gather实现的和co-parallel差不多的功能，只是增加了并行错误处理机制。因为<code>Promise.all</code>方法会在其中任何一个出问题的时候都把错误扔出来, co-gather是对all中每一个方法都做了错误处理，让<code>Promise.all</code>方法不会抛错，源码如下：</p>
+<figure class="highlight javascript"><table><tr><td class="gutter"><pre><div class="line">1</div><div class="line">2</div><div class="line">3</div><div class="line">4</div><div class="line">5</div><div class="line">6</div><div class="line">7</div><div class="line">8</div><div class="line">9</div><div class="line">10</div><div class="line">11</div><div class="line">12</div><div class="line">13</div><div class="line">14</div><div class="line">15</div><div class="line">16</div><div class="line">17</div><div class="line">18</div><div class="line">19</div></pre></td><td class="code"><pre><div class="line"><span class="keyword">var</span> thread = <span class="built_in">require</span>(<span class="string">'co-thread'</span>);</div><div class="line"><span class="built_in">module</span>.exports = <span class="function"><span class="keyword">function</span> *<span class="title">gather</span>(<span class="params">thunks, n</span>)</span>&#123;</div><div class="line">  n = <span class="built_in">Math</span>.min(n || <span class="number">5</span>, thunks.length);</div><div class="line">  <span class="keyword">var</span> ret = [];</div><div class="line">  <span class="keyword">var</span> index = <span class="number">0</span>;</div><div class="line">  <span class="function"><span class="keyword">function</span> *<span class="title">next</span>(<span class="params"></span>) </span>&#123;</div><div class="line">    <span class="keyword">var</span> i = index++;</div><div class="line">    ret[i] = &#123;<span class="attr">isError</span>: <span class="literal">false</span>&#125;;</div><div class="line">    <span class="keyword">try</span> &#123;</div><div class="line">      ret[i].value = <span class="keyword">yield</span> thunks[i];</div><div class="line">    &#125; <span class="keyword">catch</span> (err) &#123;</div><div class="line">      ret[i].error = err;</div><div class="line">      ret[i].isError = <span class="literal">true</span>;</div><div class="line">    &#125;</div><div class="line">    <span class="keyword">if</span> (index &lt; thunks.length) <span class="keyword">yield</span> next;</div><div class="line">  &#125;</div><div class="line">  <span class="keyword">yield</span> thread(next, n);</div><div class="line">  <span class="keyword">return</span> ret;</div><div class="line">&#125;;</div></pre></td></tr></table></figure>
+<p>和co-parallel不同的地方就在于对<code>yield thunks[i]</code>做了一层try catch，然后返回的包含执行结果的对象。</p>
+<h3 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h3><p>单单是看parallel的代码还是很好理解的，但是由于自己co的源码理解的不好，所以自己在捋清example的时候有点混乱了，后来又重新仔细的看了一遍了co的源码以及阮一峰的Generator的讲解，自己才弄明白。最后再次感谢<a href="http://www.chuckliu.me/" target="_blank" rel="external">Ma63d</a>提供的思路。</p>
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+    <div>
+      
+        
+
+      
+    </div>
+
+
+    <footer class="post-footer">
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2016/11/14/读书笔记之创建对象/" rel="next" title="读书笔记之创建对象">
+                <i class="fa fa-chevron-left"></i> 读书笔记之创建对象
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+  <div class="comments" id="comments">
+    
+      <div class="ds-thread" data-thread-key="2016/12/29/co-parallel & co-gather源码解析/"
+           data-title="" data-url="http://yoursite.com/2016/12/29/co-parallel & co-gather源码解析/">
+      </div>
+    
+  </div>
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap" >
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+          <img class="site-author-image" itemprop="image"
+               src="/uploads/avatar.jpeg"
+               alt="alvinyuxt" />
+          <p class="site-author-name" itemprop="name">alvinyuxt</p>
+          <p class="site-description motion-element" itemprop="description">人生匆匆，总给给自己留下点什么，所以有了这里。</p>
+        </div>
+        <nav class="site-state motion-element">
+          <div class="site-state-item site-state-posts">
+            <a href="/archives">
+              <span class="site-state-item-count">7</span>
+              <span class="site-state-item-name">日志</span>
+            </a>
+          </div>
+
+          
+            <div class="site-state-item site-state-categories">
+              <a href="/categories">
+                <span class="site-state-item-count">3</span>
+                <span class="site-state-item-name">分类</span>
+              </a>
+            </div>
+          
+
+          
+            <div class="site-state-item site-state-tags">
+              <a href="/tags">
+                <span class="site-state-item-count">3</span>
+                <span class="site-state-item-name">标签</span>
+              </a>
+            </div>
+          
+
+        </nav>
+
+        
+
+        <div class="links-of-author motion-element">
+          
+            
+              <span class="links-of-author-item">
+                <a href="https://github.com/AlvinYuXT" target="_blank" title="github">
+                  
+                    <i class="fa fa-fw fa-globe"></i>
+                  
+                  github
+                </a>
+              </span>
+            
+          
+        </div>
+
+        
+        
+
+        
+        
+
+        
+
+
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#co-parallel-amp-co-gather源码解析"><span class="nav-number">1.</span> <span class="nav-text">co-parallel & co-gather源码解析</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#co-parallel"><span class="nav-number">1.1.</span> <span class="nav-text">co-parallel</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#co-gather"><span class="nav-number">1.2.</span> <span class="nav-text">co-gather</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#总结"><span class="nav-number">1.3.</span> <span class="nav-text">总结</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright" >
+  
+  &copy; 
+  <span itemprop="copyrightYear">2016</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">alvinyuxt</span>
+</div>
+
+
+<div class="powered-by">
+  由 <a class="theme-link" href="https://hexo.io">Hexo</a> 强力驱动
+</div>
+
+<div class="theme-info">
+  主题 -
+  <a class="theme-link" href="https://github.com/iissnan/hexo-theme-next">
+    NexT.Mist
+  </a>
+</div>
+
+
+        
+
+        
+      </div>
+    </footer>
+
+    <div class="back-to-top">
+      <i class="fa fa-arrow-up"></i>
+    </div>
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+  
+  <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+
+  
+  <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+  
+  <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.0"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.0"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.0"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.0"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.0"></script>
+
+
+
+  
+
+  
+    
+  
+
+  <script type="text/javascript">
+    var duoshuoQuery = {short_name:"alvinyuxt"};
+    (function() {
+      var ds = document.createElement('script');
+      ds.type = 'text/javascript';ds.async = true;
+      ds.id = 'duoshuo-script';
+      ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+      ds.charset = 'UTF-8';
+      (document.getElementsByTagName('head')[0]
+      || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+  </script>
+
+  
+    
+    
+    <script src="/lib/ua-parser-js/dist/ua-parser.min.js?v=0.7.9"></script>
+    <script src="/js/src/hook-duoshuo.js"></script>
+  
+
+
+
+
+
+
+
+
+  
+  
+
+  
+
+  
+
+  
+
+  
+
+
+</body>
+</html>
